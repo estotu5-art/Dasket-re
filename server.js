@@ -141,7 +141,6 @@ const server = net.createServer((client) => {
             }
 
             stage = "connected";
-            client.write(Buffer.from([0]));
             console.log("TARGET CONNECTED:", host, port);
 
             if (initialPayload.length) {
@@ -155,19 +154,11 @@ const server = net.createServer((client) => {
 
           remote.on("error", (err) => {
             console.log("REMOTE ERROR:", err.message);
-            if (stage !== "connected" && !client.destroyed) {
-              client.end(Buffer.from([1]));
-            } else {
-              client.destroy();
-            }
+            client.destroy();
           });
 
           remote.on("close", () => {
-            if (stage !== "connected" && !client.destroyed) {
-              client.end(Buffer.from([1]));
-            } else {
-              client.destroy();
-            }
+            client.destroy();
           });
         } catch (err) {
           reject(err.message);
